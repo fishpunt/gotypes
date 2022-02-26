@@ -1,3 +1,3 @@
-module github.com/fishpunt/types
+module github.com/fishpunt/gotypes
 
 go 1.17
