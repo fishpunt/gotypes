@@ -2,6 +2,7 @@ package datetime
 
 import (
 	"database/sql/driver"
+	"fmt"
 	"time"
 )
 
@@ -27,7 +28,7 @@ func (dt NullDateTime) MarshalJSON() ([]byte, error) {
 	if !dt.Valid {
 		return []byte("null"), nil
 	}
-	return []byte(dt.Time.Format(dateTimeLayoutAlt)), nil
+	return []byte(fmt.Sprintf("%q", dt.Time.Format(dateTimeLayoutAlt))), nil
 }
 
 // Value

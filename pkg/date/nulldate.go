@@ -1,6 +1,9 @@
 package date
 
-import "database/sql/driver"
+import (
+	"database/sql/driver"
+	"fmt"
+)
 
 type NullDate struct {
 	Date
@@ -11,7 +14,7 @@ func (dt NullDate) MarshalJSON() ([]byte, error) {
 	if !dt.Valid {
 		return []byte("null"), nil
 	}
-	return []byte(dt.String()), nil
+	return []byte(fmt.Sprintf("%q", dt.String())), nil
 }
 
 // Value

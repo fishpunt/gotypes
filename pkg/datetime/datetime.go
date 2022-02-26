@@ -88,7 +88,7 @@ func (dt DateTime) MarshalJSON() ([]byte, error) {
 	if !dt.Valid {
 		return []byte(""), nil
 	}
-	return []byte(dt.Time.Format(dateTimeLayoutAlt)), nil
+	return []byte(fmt.Sprintf("%q", dt.Time.Format(dateTimeLayoutAlt))), nil
 }
 
 // Scan

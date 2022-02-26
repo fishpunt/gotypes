@@ -44,8 +44,8 @@ func (dt Date) String() string {
 	if !dt.Valid {
 		return ""
 	}
-	t := time.Time(dt.Time)
-	return t.Format(dateLayout)
+
+	return dt.Time.Format(dateLayout)
 }
 
 // UnmarshalXML
@@ -87,7 +87,7 @@ func (dt Date) MarshalJSON() ([]byte, error) {
 	if !dt.Valid {
 		return []byte(""), nil
 	}
-	return []byte(dt.String()), nil
+	return []byte(fmt.Sprintf("%q", dt.String())), nil
 }
 
 // Scan
