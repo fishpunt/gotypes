@@ -11,6 +11,7 @@ import (
 const (
 	dateTimeLayout       = time.RFC3339
 	dateTimeLayoutAlt    = "2006-01-02T15:04:05"
+	dateTimeLayoutAlt2   = "2006-01-02T15:04Z07:00"
 	dateTimeEncodeLayout = time.RFC3339
 	DateTimeDefaultValue = "1970-01-01T00:00:00"
 )
@@ -115,7 +116,10 @@ func (dt DateTime) parseTime(src string) (time.Time, error) {
 		// With Timezone
 		result, err = time.Parse(dateTimeLayoutAlt, src)
 		if err != nil {
-			return result, fmt.Errorf("datetime failed to parse time. (error: %s)", err)
+			result, err = time.Parse(dateTimeLayoutAlt2, src)
+			if err != nil {
+				return result, fmt.Errorf("datetime failed to parse time. (error: %s)", err)
+			}
 		}
 	}
 
