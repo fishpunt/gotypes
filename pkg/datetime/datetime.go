@@ -114,8 +114,10 @@ func (dt DateTime) parseTime(src string) (time.Time, error) {
 	result, err := time.Parse(dateTimeLayout, src)
 	if err != nil {
 		// With Timezone
+		err = nil
 		result, err = time.Parse(dateTimeLayoutAlt, src)
 		if err != nil {
+			err = nil
 			result, err = time.Parse(dateTimeLayoutAlt2, src)
 			if err != nil {
 				return result, fmt.Errorf("datetime failed to parse time. (error: %s)", err)
