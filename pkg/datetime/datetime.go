@@ -26,7 +26,7 @@ type DateTime struct {
 }
 
 // New
-func New(src *time.Time) DateTime {
+func NewDateTime(src *time.Time) DateTime {
 	if src == nil {
 		now := time.Now()
 		src = &now
@@ -110,6 +110,25 @@ func (dt DateTime) Value() (driver.Value, error) {
 
 // ParseTime from different layouts
 func (dt DateTime) parseTime(src string) (time.Time, error) {
+
+	result, err := time.Parse(dateTimeLayout, src)
+	if err != nil {
+		// With Timezone
+		err = nil
+		result, err = time.Parse(dateTimeLayoutAlt, src)
+		if err != nil {
+			err = nil
+			result, err = time.Parse(dateTimeLayoutAlt2, src)
+			if err != nil {
+				return result, fmt.Errorf("datetime failed to parse time. (error: %s)", err)
+			}
+		}
+	}
+
+	return result, nil
+}
+
+func ParseTime(src string) (time.Time, error) {
 
 	result, err := time.Parse(dateTimeLayout, src)
 	if err != nil {

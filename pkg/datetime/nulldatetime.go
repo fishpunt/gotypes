@@ -10,7 +10,7 @@ type NullDateTime struct {
 	DateTime
 }
 
-func NullNew(src *time.Time) NullDateTime {
+func NewNullDatetime(src *time.Time) NullDateTime {
 	if src == nil {
 		now := time.Now()
 		src = &now

@@ -3,10 +3,24 @@ package date
 import (
 	"database/sql/driver"
 	"fmt"
+	"time"
 )
 
 type NullDate struct {
 	Date
+}
+
+func NewNullDate(src *time.Time) NullDate {
+	if src == nil {
+		now := time.Now()
+		src = &now
+	}
+
+	dt := NullDate{}
+	dt.Time = *src
+	dt.Valid = true
+
+	return dt
 }
 
 // MarshalJSON

@@ -24,7 +24,7 @@ type Date struct {
 }
 
 // New
-func New(src *time.Time) Date {
+func NewDate(src *time.Time) Date {
 	if src == nil {
 		now := time.Now()
 		src = &now
