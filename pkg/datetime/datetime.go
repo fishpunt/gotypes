@@ -63,6 +63,11 @@ func (dt *DateTime) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	if err != nil {
 		return fmt.Errorf("datetime UnmarshalXML error: %s", err)
 	}
+	if result.IsZero() {
+		dt.Valid = false
+		return nil
+	}
+
 	dt.Time = result
 	dt.Valid = true
 
@@ -78,14 +83,15 @@ func (dt DateTime) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 // UnmarshalJSON
 func (dt *DateTime) UnmarshalJSON(b []byte) error {
 	s := strings.Trim(string(b), `"`)
-	if s == "" {
-		dt.Valid = false
-		return nil
-	}
 
 	nt, err := dt.parseTime(s)
 	if err != nil {
 		return fmt.Errorf("datetime MarshalXML error: %s", err)
+	}
+
+	if nt.IsZero() {
+		dt.Valid = false
+		return nil
 	}
 
 	dt.Time = nt
@@ -120,26 +126,10 @@ func (dt DateTime) Value() (driver.Value, error) {
 
 // ParseTime from different layouts
 func (dt DateTime) parseTime(src string) (time.Time, error) {
-
-	result, err := time.Parse(dateTimeLayout, src)
-	if err != nil {
-		// With Timezone
-		err = nil
-		result, err = time.Parse(dateTimeLayoutAlt, src)
-		if err != nil {
-			err = nil
-			result, err = time.Parse(dateTimeLayoutAlt2, src)
-			if err != nil {
-				return result, fmt.Errorf("datetime failed to parse time. (error: %s)", err)
-			}
-		}
+	var result time.Time
+	if src == "" {
+		return result, nil
 	}
-
-	return result, nil
-}
-
-func ParseTime(src string) (time.Time, error) {
-
 	result, err := time.Parse(dateTimeLayout, src)
 	if err != nil {
 		// With Timezone
