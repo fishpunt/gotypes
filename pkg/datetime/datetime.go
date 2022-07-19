@@ -54,6 +54,11 @@ func (dt DateTime) String() string {
 func (dt *DateTime) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var v string
 	d.DecodeElement(&v, &start)
+	if v == "" {
+		dt.Valid = false
+		return nil
+	}
+
 	result, err := dt.parseTime(v)
 	if err != nil {
 		return fmt.Errorf("datetime UnmarshalXML error: %s", err)
@@ -73,6 +78,11 @@ func (dt DateTime) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 // UnmarshalJSON
 func (dt *DateTime) UnmarshalJSON(b []byte) error {
 	s := strings.Trim(string(b), `"`)
+	if s == "" {
+		dt.Valid = false
+		return nil
+	}
+
 	nt, err := dt.parseTime(s)
 	if err != nil {
 		return fmt.Errorf("datetime MarshalXML error: %s", err)

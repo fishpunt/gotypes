@@ -52,6 +52,11 @@ func (dt Date) String() string {
 func (dt *Date) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var v string
 	d.DecodeElement(&v, &start)
+	if v == "" {
+		dt.Valid = false
+		return nil
+	}
+
 	result, err := time.Parse(dateLayout, v)
 	if err != nil {
 		return fmt.Errorf("date UnmarshalXML error: %s", err)
@@ -71,6 +76,11 @@ func (dt Date) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 // UnmarshalJSON
 func (dt *Date) UnmarshalJSON(b []byte) error {
 	s := strings.Trim(string(b), `"`)
+	if s == "" {
+		dt.Valid = false
+		return nil
+	}
+
 	nt, err := time.Parse(dateLayout, s)
 	if err != nil {
 		return fmt.Errorf("date UnmarshalJSON error: %s", err)
