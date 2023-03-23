@@ -113,7 +113,7 @@ func (dt Date) Value() (driver.Value, error) {
 	if !dt.Valid {
 		return "", nil
 	}
-	return dt.Time, nil
+	return dt.String(), nil
 }
 
 func (dt Date) EqualTo(src time.Time) bool {
