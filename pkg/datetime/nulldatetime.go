@@ -28,7 +28,7 @@ func (dt NullDateTime) MarshalJSON() ([]byte, error) {
 	if !dt.Valid {
 		return []byte("null"), nil
 	}
-	return []byte(fmt.Sprintf("%q", dt.Time.Format(dateTimeLayoutAlt))), nil
+	return []byte(fmt.Sprintf("%q", dt.Time.Format(defaultDatetimeLayout))), nil
 }
 
 // Value

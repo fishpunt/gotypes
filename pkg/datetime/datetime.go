@@ -8,14 +8,6 @@ import (
 	"time"
 )
 
-const (
-	dateTimeLayout       = time.RFC3339
-	dateTimeLayoutAlt    = "2006-01-02T15:04:05"
-	dateTimeLayoutAlt2   = "2006-01-02T15:04Z07:00"
-	dateTimeEncodeLayout = time.RFC3339
-	DateTimeDefaultValue = "1970-01-01T00:00:00"
-)
-
 /**
  * DateTime type
  */
@@ -47,7 +39,7 @@ func (dt DateTime) String() string {
 		return ""
 	}
 
-	return dt.Time.Format(dateTimeLayout)
+	return dt.Time.Format(datetimeLayoutOutput)
 }
 
 // UnmarshalXML
@@ -61,7 +53,7 @@ func (dt *DateTime) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 
 	result, err := dt.parseTime(v)
 	if err != nil {
-		return fmt.Errorf("datetime UnmarshalXML error: %s", err)
+		return err
 	}
 	if result.IsZero() {
 		dt.Valid = false
@@ -84,9 +76,14 @@ func (dt DateTime) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 func (dt *DateTime) UnmarshalJSON(b []byte) error {
 	s := strings.Trim(string(b), `"`)
 
+	if s == "" {
+		dt.Valid = false
+		return nil
+	}
+
 	nt, err := dt.parseTime(s)
 	if err != nil {
-		return fmt.Errorf("datetime MarshalXML error: %s", err)
+		return err
 	}
 
 	if nt.IsZero() {
@@ -105,7 +102,7 @@ func (dt DateTime) MarshalJSON() ([]byte, error) {
 	if !dt.Valid {
 		return []byte(""), nil
 	}
-	return []byte(fmt.Sprintf("%q", dt.Time.Format(dateTimeLayoutAlt))), nil
+	return []byte(fmt.Sprintf("%q", dt.Time.Format(datetimeLayoutOutput))), nil
 }
 
 // Scan
@@ -127,24 +124,22 @@ func (dt DateTime) Value() (driver.Value, error) {
 // ParseTime from different layouts
 func (dt DateTime) parseTime(src string) (time.Time, error) {
 	var result time.Time
-	if src == "" {
-		return result, nil
-	}
-	result, err := time.Parse(dateTimeLayout, src)
-	if err != nil {
-		// With Timezone
-		err = nil
-		result, err = time.Parse(dateTimeLayoutAlt, src)
-		if err != nil {
-			err = nil
-			result, err = time.Parse(dateTimeLayoutAlt2, src)
-			if err != nil {
-				return result, fmt.Errorf("datetime failed to parse time. (error: %s)", err)
-			}
+
+	var err error
+	var firstError error
+	var hasError bool
+	for _, v := range datetimeLayoutInputs {
+		result, err = time.Parse(v, src)
+		if err == nil {
+			return result, nil
+		}
+		if !hasError {
+			hasError = true
+			firstError = err
 		}
 	}
 
-	return result, nil
+	return result, firstError
 }
 
 func (dt DateTime) DateEqual(src time.Time) bool {

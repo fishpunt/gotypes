@@ -8,12 +8,6 @@ import (
 	"time"
 )
 
-const (
-	dateLayout       = "2006-01-02"
-	dateEncodeLayout = "2006-01-02"
-	dateDefaultValue = "1970-01-01"
-)
-
 /**
  * Date type
  */
@@ -45,7 +39,7 @@ func (dt Date) String() string {
 		return ""
 	}
 
-	return dt.Time.Format(dateLayout)
+	return dt.Time.Format(*dateLayoutOutput)
 }
 
 // UnmarshalXML
@@ -57,9 +51,9 @@ func (dt *Date) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 		return nil
 	}
 
-	result, err := time.Parse(dateLayout, v)
+	result, err := time.Parse(*dateLayoutInput, v)
 	if err != nil {
-		return fmt.Errorf("date UnmarshalXML error: %s", err)
+		return err
 	}
 	dt.Time = result
 	dt.Valid = true
@@ -81,9 +75,9 @@ func (dt *Date) UnmarshalJSON(b []byte) error {
 		return nil
 	}
 
-	nt, err := time.Parse(dateLayout, s)
+	nt, err := time.Parse(*dateLayoutInput, s)
 	if err != nil {
-		return fmt.Errorf("date UnmarshalJSON error: %s", err)
+		return err
 	}
 
 	dt.Time = nt
