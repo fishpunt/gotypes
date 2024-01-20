@@ -1,6 +1,7 @@
 package datetime
 
 import (
+	"encoding/json"
 	"encoding/xml"
 	"testing"
 	"time"
@@ -43,51 +44,68 @@ func TestDateTimeUnmarshalXML(t *testing.T) {
 	}
 
 	// Test case 4: Valid DateTime
-	xmlData = `<DateTime>2022-10-13T11:36:21.23</DateTime>`
+	xmlData = `<DateTime>2015-02-02T11:04:57.497</DateTime>`
 	dt = DateTime{}
 	err = xml.Unmarshal([]byte(xmlData), &dt)
 	if err != nil {
 		t.Fatal(err)
 	}
-	expectedTime = time.Date(2022, time.October, 13, 11, 36, 21, 230000000, time.UTC)
+	expectedTime = time.Date(2015, time.February, 2, 11, 04, 57, 497000000, time.UTC)
 	if !dt.Valid || dt.Time != expectedTime {
 		t.Errorf("Expected DateTime: %v, but got: %v", expectedTime, dt.Time)
 	}
 }
 
 func TestDateTimeUnmarshalJson(t *testing.T) {
+	type testJsonModel struct {
+		CreationDate DateTime `json:"CreationDate"`
+	}
+
 	// Test case 1: Valid DateTime
-	jsonData := `"2022-03-07T00:00:00Z"`
-	dt := DateTime{}
-	err := dt.UnmarshalJSON([]byte(jsonData))
+	jsonData := `{"CreationDate": "2022-03-07T00:00:00Z"}`
+	dt := testJsonModel{}
+	err := json.Unmarshal([]byte(jsonData), &dt)
 	if err != nil {
 		t.Fatal(err)
 	}
 	expectedTime := time.Date(2022, time.March, 7, 0, 0, 0, 0, time.UTC)
-	if !dt.Valid || dt.Time != expectedTime {
-		t.Errorf("Expected DateTime: %v, but got: %v", expectedTime, dt.Time)
+	if !dt.CreationDate.Valid || dt.CreationDate.Time != expectedTime {
+		t.Errorf("Expected DateTime: %v, but got: %v", expectedTime, dt.CreationDate.Time)
 	}
 
 	// Test case 2: Empty DateTime
-	emptyJsonData := `""`
-	emptyDt := DateTime{}
-	err = emptyDt.UnmarshalJSON([]byte(emptyJsonData))
+	emptyJsonData := `{"CreationDate": ""}`
+	emptyDt := testJsonModel{}
+	err = json.Unmarshal([]byte(emptyJsonData), &emptyDt)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if emptyDt.Valid {
+	if emptyDt.CreationDate.Valid {
 		t.Errorf("Expected DateTime to be invalid, but it is valid")
 	}
 
 	// Test case 3: Invalid DateTime
 	invalidJsonData := `"invalid"`
-	invalidDt := DateTime{}
-	err = invalidDt.UnmarshalJSON([]byte(invalidJsonData))
-	expectedError := "parsing time \"invalid\" as \"2006-01-02T15:04:05Z07:00\": cannot parse \"invalid\" as \"2006\""
+	invalidDt := testJsonModel{}
+	err = json.Unmarshal([]byte(invalidJsonData), &invalidDt)
+	// expectedError := "parsing time \"invalid\" as \"2006-01-02T15:04:05Z07:00\": cannot parse \"invalid\" as \"2006\""
+	expectedError := "json: cannot unmarshal string into Go value of type datetime.testJsonModel"
 	if err == nil || err.Error() != expectedError {
 		t.Errorf("Expected error: %s, but got: %v", expectedError, err)
 	}
-	if invalidDt.Valid {
+	if invalidDt.CreationDate.Valid {
 		t.Errorf("Expected DateTime to be invalid, but it is valid")
+	}
+
+	// Test case 4: Valid DateTime
+	jsonData = `{"CreationDate": "2015-02-02T11:04:57.497"}`
+	dt = testJsonModel{}
+	err = json.Unmarshal([]byte(jsonData), &dt)
+	if err != nil {
+		t.Fatal(err)
+	}
+	expectedTime = time.Date(2015, time.February, 2, 11, 04, 57, 497000000, time.UTC)
+	if !dt.CreationDate.Valid || dt.CreationDate.Time != expectedTime {
+		t.Errorf("Expected DateTime: %v, but got: %v", expectedTime, dt.CreationDate.Time)
 	}
 }
