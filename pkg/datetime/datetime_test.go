@@ -41,6 +41,18 @@ func TestDateTimeUnmarshalXML(t *testing.T) {
 	if invalidDt.Valid {
 		t.Errorf("Expected DateTime to be invalid, but it is valid")
 	}
+
+	// Test case 4: Valid DateTime
+	xmlData = `<DateTime>2022-10-13T11:36:21.23</DateTime>`
+	dt = DateTime{}
+	err = xml.Unmarshal([]byte(xmlData), &dt)
+	if err != nil {
+		t.Fatal(err)
+	}
+	expectedTime = time.Date(2022, time.October, 13, 11, 36, 21, 230000000, time.UTC)
+	if !dt.Valid || dt.Time != expectedTime {
+		t.Errorf("Expected DateTime: %v, but got: %v", expectedTime, dt.Time)
+	}
 }
 
 func TestDateTimeUnmarshalJson(t *testing.T) {

@@ -21,7 +21,7 @@ func init() {
 	datetimeLayoutInputs = make(map[string]string)
 	datetimeLayoutInputs[defaultDatetimeLayout] = defaultDatetimeLayout
 	datetimeLayoutInputs["2006-01-02T15:04:05"] = "2006-01-02T15:04:05"
-	datetimeLayoutInputs["2006-01-02T15:04Z07:00"] = "2006-01-02T15:04Z07:00"
+	datetimeLayoutInputs["2006-01-02T15:04:05Z07:00"] = "2006-01-02T15:04:05Z07:00"
 }
 
 // SetOutputLayout
