@@ -11,12 +11,13 @@ const (
 
 var (
 	mtx                  sync.Mutex
-	datetimeLayoutOutput string
+	datetimeLayoutOutput *string
 	datetimeLayoutInputs map[string]string
 )
 
 func init() {
-	datetimeLayoutOutput = defaultDatetimeLayout
+	defaultDatetimeOutput := defaultDatetimeLayout
+	datetimeLayoutOutput = &defaultDatetimeOutput
 
 	datetimeLayoutInputs = make(map[string]string)
 	datetimeLayoutInputs[defaultDatetimeLayout] = defaultDatetimeLayout
@@ -28,12 +29,12 @@ func init() {
 func SetOutputLayout(layout string) {
 	mtx.Lock()
 	defer mtx.Unlock()
-	datetimeLayoutOutput = layout
+	*datetimeLayoutOutput = layout
 }
 
 // OutputLayout
 func OutputLayout() string {
-	return datetimeLayoutOutput
+	return *datetimeLayoutOutput
 }
 
 // SetInputLayout

@@ -109,3 +109,42 @@ func TestDateTimeUnmarshalJson(t *testing.T) {
 		t.Errorf("Expected DateTime: %v, but got: %v", expectedTime, dt.CreationDate.Time)
 	}
 }
+
+// Test MarshalJSON
+func TestDateTimeMarshalJSON(t *testing.T) {
+	type testJsonModel struct {
+		CreationDate DateTime `json:"CreationDate"`
+	}
+
+	// Test case 1: Valid DateTime
+	dt := testJsonModel{
+		CreationDate: DateTime{
+			Time:  time.Date(2022, time.March, 7, 0, 0, 0, 0, time.UTC),
+			Valid: true,
+		},
+	}
+	expectedResult := `{"CreationDate":"2022-03-07T00:00:00Z"}`
+	result, err := json.Marshal(dt)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(result) != expectedResult {
+		t.Errorf("Expected result: %s, but got: %s", expectedResult, result)
+	}
+
+	// Test case 2: Invalid DateTime
+	invalidDt := testJsonModel{
+		CreationDate: DateTime{
+			Valid: false,
+		},
+	}
+	expectedResult = `{"CreationDate":""}`
+	result, err = json.Marshal(invalidDt)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(result) != expectedResult {
+		t.Errorf("Expected result: %s, but got: %s", expectedResult, result)
+	}
+
+}

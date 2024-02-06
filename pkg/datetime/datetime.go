@@ -39,7 +39,7 @@ func (dt DateTime) String() string {
 		return ""
 	}
 
-	return dt.Time.Format(datetimeLayoutOutput)
+	return dt.Time.Format(*datetimeLayoutOutput)
 }
 
 // UnmarshalXML
@@ -100,9 +100,9 @@ func (dt *DateTime) UnmarshalJSON(b []byte) error {
 // MarshalJSON
 func (dt DateTime) MarshalJSON() ([]byte, error) {
 	if !dt.Valid {
-		return []byte(""), nil
+		return []byte("\"\""), nil
 	}
-	return []byte(fmt.Sprintf("%q", dt.Time.Format(datetimeLayoutOutput))), nil
+	return []byte(fmt.Sprintf("%q", dt.String())), nil
 }
 
 // Scan
@@ -127,16 +127,18 @@ func (dt DateTime) parseTime(src string) (time.Time, error) {
 
 	var err error
 	var firstError error
-	var hasError bool
 	for _, v := range datetimeLayoutInputs {
 		result, err = time.Parse(v, src)
 		if err == nil {
 			return result, nil
 		}
-		if !hasError {
-			hasError = true
+		if v == *datetimeLayoutOutput {
 			firstError = err
 		}
+	}
+
+	if err != nil && firstError == nil {
+		return result, err
 	}
 
 	return result, firstError

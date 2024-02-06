@@ -51,7 +51,8 @@ func (dt *Date) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 		return nil
 	}
 
-	result, err := time.Parse(*dateLayoutInput, v)
+	// result, err := time.Parse(*dateLayoutInput, v)
+	result, err := dt.parseTime(v)
 	if err != nil {
 		return err
 	}
@@ -75,7 +76,8 @@ func (dt *Date) UnmarshalJSON(b []byte) error {
 		return nil
 	}
 
-	nt, err := time.Parse(*dateLayoutInput, s)
+	// nt, err := time.Parse(*dateLayoutInput, s)
+	nt, err := dt.parseTime(s)
 	if err != nil {
 		return err
 	}
@@ -89,7 +91,7 @@ func (dt *Date) UnmarshalJSON(b []byte) error {
 // MarshalJSON
 func (dt Date) MarshalJSON() ([]byte, error) {
 	if !dt.Valid {
-		return []byte(""), nil
+		return []byte("\"\""), nil
 	}
 	return []byte(fmt.Sprintf("%q", dt.String())), nil
 }
@@ -118,4 +120,27 @@ func (dt Date) EqualTo(src time.Time) bool {
 	y1, m1, d1 := dt.Time.Date()
 	y2, m2, d2 := src.Date()
 	return y1 == y2 && m1 == m2 && d1 == d2
+}
+
+// ParseTime from different layouts
+func (dt Date) parseTime(src string) (time.Time, error) {
+	var result time.Time
+
+	var err error
+	var firstError error
+	for _, v := range dateLayoutInputs {
+		result, err = time.Parse(v, src)
+		if err == nil {
+			return result, nil
+		}
+		if v == *dateLayoutOutput {
+			firstError = err
+		}
+	}
+
+	if err != nil && firstError == nil {
+		return result, err
+	}
+
+	return result, firstError
 }

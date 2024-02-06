@@ -7,7 +7,7 @@ import (
 )
 
 func TestDateUnmarshalXML(t *testing.T) {
-	// Test case 1: Valid DateTime
+	// Test case 1: Valid Date
 	dateStr := "2022-03-07"
 	xmlStr := "<Date>" + dateStr + "</Date>"
 
@@ -18,7 +18,7 @@ func TestDateUnmarshalXML(t *testing.T) {
 	}
 
 	expectedDate, _ := time.Parse("2006-01-02", dateStr)
-	if !dt.Valid || dt.Time != expectedDate {
+	if !dt.Valid || !dt.Time.Equal(expectedDate) {
 		t.Errorf("Unexpected result. Expected: %s, Got: %s", expectedDate, dt.Time)
 	}
 
@@ -43,6 +43,21 @@ func TestDateUnmarshalXML(t *testing.T) {
 	}
 	if invalidDt.Valid {
 		t.Errorf("Expected Date to be invalid, but it is valid")
+	}
+
+	// Test case 4: Valid DateTime
+	date2Str := "2023-01-04T15:36:22"
+	xml2Str := "<Date>" + date2Str + "</Date>"
+
+	dt2 := &Date{}
+	err = xml.Unmarshal([]byte(xml2Str), dt2)
+	if err != nil {
+		t.Fatalf("Failed to unmarshal XML: %s", err)
+	}
+
+	expected2Date, _ := time.Parse("2006-01-02T15:04:05", date2Str)
+	if !dt2.Valid || dt2.Time.Format("2006-01-02") != expected2Date.Format("2006-01-02") {
+		t.Errorf("Unexpected result. Expected: %s, Got: %s", expected2Date.Format("2006-01-02"), dt2.Time.Format("2006-01-02"))
 	}
 }
 
@@ -70,7 +85,7 @@ func TestDateUnmarshalJson(t *testing.T) {
 		t.Fatalf("Failed to unmarshal JSON: %s", err)
 	}
 	if emptyDt.Valid {
-		t.Errorf("Expected Date to be invalid, but it is valid")
+		t.Fatalf("Expected Date to be invalid, but it is valid")
 	}
 
 	// Test case 3: Invalid Date
@@ -82,6 +97,21 @@ func TestDateUnmarshalJson(t *testing.T) {
 		t.Errorf("Expected error: %s, but got: %v", expectedError, err)
 	}
 	if invalidDt.Valid {
-		t.Errorf("Expected Date to be invalid, but it is valid")
+		t.Fatalf("Expected Date to be invalid, but it is valid")
+	}
+
+	// Test case 4: Valid DateTime
+	date2Str := "2023-01-04T15:36:22"
+	json2Str := "\"" + date2Str + "\""
+
+	dt2 := &Date{}
+	err = dt2.UnmarshalJSON([]byte(json2Str))
+	if err != nil {
+		t.Fatalf("Failed to unmarshal JSON: %s", err)
+	}
+
+	expected2Date, _ := time.Parse("2006-01-02T15:04:05", date2Str)
+	if !dt2.Valid || dt2.Time.Format("2006-01-02") != expected2Date.Format("2006-01-02") {
+		t.Errorf("Unexpected result. Expected: %s, Got: %s", expected2Date.Format("2006-01-02"), dt2.Time.Format("2006-01-02"))
 	}
 }
