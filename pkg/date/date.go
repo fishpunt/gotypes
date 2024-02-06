@@ -71,7 +71,7 @@ func (dt Date) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 // UnmarshalJSON
 func (dt *Date) UnmarshalJSON(b []byte) error {
 	s := strings.Trim(string(b), `"`)
-	if s == "" {
+	if s == "" || s == "null" {
 		dt.Valid = false
 		return nil
 	}
