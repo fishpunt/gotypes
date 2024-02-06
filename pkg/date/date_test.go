@@ -114,4 +114,16 @@ func TestDateUnmarshalJson(t *testing.T) {
 	if !dt2.Valid || dt2.Time.Format("2006-01-02") != expected2Date.Format("2006-01-02") {
 		t.Errorf("Unexpected result. Expected: %s, Got: %s", expected2Date.Format("2006-01-02"), dt2.Time.Format("2006-01-02"))
 	}
+
+	// Test case 5: Null DateTime
+	nullJsonData := "null"
+	nullDt := &Date{}
+	err = nullDt.UnmarshalJSON([]byte(nullJsonData))
+	expectedError = "parsing time \"null\" as \"2006-01-02\": cannot parse \"null\" as \"2006\""
+	if err == nil || err.Error() != expectedError {
+		t.Errorf("Expected error: %s, but got: %v", expectedError, err)
+	}
+	if nullDt.Valid {
+		t.Fatalf("Expected Date to be invalid, but it is valid")
+	}
 }

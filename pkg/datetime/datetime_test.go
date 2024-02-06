@@ -108,6 +108,18 @@ func TestDateTimeUnmarshalJson(t *testing.T) {
 	if !dt.CreationDate.Valid || dt.CreationDate.Time != expectedTime {
 		t.Errorf("Expected DateTime: %v, but got: %v", expectedTime, dt.CreationDate.Time)
 	}
+
+	// Test case 5: Null DateTime
+	nullJsonData := `{"CreationDate": null}`
+	nullDt := testJsonModel{}
+	err = json.Unmarshal([]byte(nullJsonData), &nullDt)
+	expectedError = "parsing time \"null\" as \"2006-01-02T15:04:05Z07:00\": cannot parse \"null\" as \"2006\""
+	if err == nil || err.Error() != expectedError {
+		t.Errorf("Expected error: %s, but got: %v", expectedError, err)
+	}
+	if nullDt.CreationDate.Valid {
+		t.Errorf("Expected DateTime to be invalid, but it is valid")
+	}
 }
 
 // Test MarshalJSON
